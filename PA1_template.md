@@ -1,12 +1,6 @@
----
-title: 'Reproducible Research: Programming Assignment 1'
-author: "Alex Looi"
-date: "Wednesday, April 15, 2015"
-output:
-  html_document:
-    keep_md: yes
-  pdf_document: default
----
+# Reproducible Research: Programming Assignment 1
+Alex Looi  
+Wednesday, April 15, 2015  
 
 ================================================================================
 
@@ -80,15 +74,55 @@ Please ensure that the required librarys are installed.
 The code will also set the default global options.
 
 #### --- Load Library ---
-```{r loadlibrary}
+
+```r
 library(knitr)
+```
+
+```
+## Warning: package 'knitr' was built under R version 3.1.3
+```
+
+```r
 library(dplyr)
+```
+
+```
+## Warning: package 'dplyr' was built under R version 3.1.3
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+## 
+## The following object is masked from 'package:stats':
+## 
+##     filter
+## 
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
 library(Rcpp)
+```
+
+```
+## Warning: package 'Rcpp' was built under R version 3.1.3
+```
+
+```r
 library(ggplot2)
 ```
 
+```
+## Warning: package 'ggplot2' was built under R version 3.1.3
+```
+
 #### --- Set Global Options ---
-```{r globaloption}
+
+```r
 opts_chunk$set(echo = TRUE) # include R codes in output file
 options(scipen = 100) # numbers are displayed in full.
 ```
@@ -105,7 +139,8 @@ read in the csv file, and sort it according to the data variable follow by the
 interval variable (just in case it is not already sorted).
 
 #### --- Download and Unzip Raw Data Set ---
-```{r downloadfile}
+
+```r
 if (!file.exists("data")) dir.create("data") # creates a "data" directory
 setInternet2(use = TRUE) # to enable IE for downloading file from https.
 url <- "https://github.com/looialex/RepData_PeerAssessment1/blob/master/activity.zip?raw=true"
@@ -122,7 +157,8 @@ if (file.exists("./data/activity.zip")){
 ```
 
 #### --- Reading in data set ---
-```{r readdata}
+
+```r
 data <- read.csv("./data/activity.csv")
 data <- as.tbl(data) # convert to tbl df to use dplyr functions.
 data <- arrange(data, date, interval) # Sort data set by date then by interval
@@ -143,7 +179,8 @@ Specifically, the code performs the following:
 Note that missing values in the data set are ignored
 
 #### --- Total number of steps taken per day ---
-```{r totalsteps}
+
+```r
 data_noNA <- na.omit(data) # remove observations with NA.
 data_bydate <- group_by(data_noNA, date)     # Group data by date
 sum_bydate <- summarize(data_bydate, totalsteps = sum(steps)) # add up the steps
@@ -152,7 +189,8 @@ sum_bydate <- summarize(data_bydate, totalsteps = sum(steps)) # add up the steps
 
 #### --- Histogram of the total number of steps taken each day ---
 *Note that the binwidth of the Histogram is the system default binwidth.*
-```{r Histogram}
+
+```r
 title <- "Histogram - Total Steps Per Day" # assign chart title
 xlabel <- "Steps Per Day"       # assign X label
 ylabel <- "Number of Days"      # assign y label
@@ -161,15 +199,18 @@ p <- g + geom_histogram() + labs(list(title = title, x = xlabel, y = ylabel))
 print(p)
 ```
 
+![](PA1_template_files/figure-html/Histogram-1.png) 
+
 
 #### --- Mean and Median of the total number of steps taken per day ---
-```{r mean_median}
+
+```r
 meansteps <- mean(sum_bydate$totalsteps)        # calculate mean
 mediansteps <- median(sum_bydate$totalsteps)    # calculate median
 ```
 
-**The mean of the total number of steps taken per day is `r meansteps`.**  
-**The median of the total number of steps taken per day `r mediansteps`.**
+**The mean of the total number of steps taken per day is 10766.1886792.**  
+**The median of the total number of steps taken per day 10765.**
 
 
 ================================================================================
@@ -188,7 +229,8 @@ contains the maximum number of steps.
 Note that missing values in the data set are ignored
 
 #### --- Time series plot ---
-```{r timeseries}
+
+```r
 data_byint <- group_by(data_noNA, interval)  # group data by interval
 mean_byint <- summarize(data_byint, averagesteps = mean(steps))
 
@@ -201,15 +243,18 @@ p <- g + geom_line() + labs(list(title = title, x = xlabel, y = ylabel))
 print(p)
 ```
 
+![](PA1_template_files/figure-html/timeseries-1.png) 
+
 #### --- Maximum average number of steps ---
-```{r maxaverage}
+
+```r
 maxavg <- max(mean_byint$averagesteps) # find out the max of variable averagesteps
 int_maxavg <- filter(mean_byint, averagesteps == maxavg)
 ```
 
 **The 5-minute interval, on average across all the days in the dataset,
-which contains the maximum number of steps is at interval `r int_maxavg[,1]`.
-At this 5-minute interval, the average number of steps is `r maxavg`.**
+which contains the maximum number of steps is at interval 835.
+At this 5-minute interval, the average number of steps is 206.1698113.**
 
 
 ================================================================================
@@ -238,11 +283,12 @@ number of steps?
 
 
 #### --- Total number of missing values ---
-```{r totalNA}
+
+```r
 totalNA <- sum(is.na(data$steps)) # count the number of NA
 ```
 
-**The total number of missing values in the dataset is `r totalNA`.**
+**The total number of missing values in the dataset is 2304.**
 <br>
 <br>
 
@@ -250,7 +296,8 @@ totalNA <- sum(is.na(data$steps)) # count the number of NA
 
 The NAs will be filled with the average of the 5-minute interval across all days.
 
-```{r fillNA}
+
+```r
 # Calculate mean_byint again in case user wants to run this step only.
 mean_byint <- summarize(data_byint, averagesteps = mean(steps))
 
@@ -266,7 +313,8 @@ newdata <- select(newdata, -averagesteps) # delete variable "averagesteps"
 <br>
 
 #### --- Histogram, Mean and Median of new dataset ---
-```{r totalsteps_newdata}
+
+```r
 newdata <- as.tbl(newdata) # convert to tbl df to use dplyr functions.
 newdata_bydate <- group_by(newdata, date)     # Group data by date
 
@@ -274,7 +322,8 @@ newdata_bydate <- group_by(newdata, date)     # Group data by date
 newsum_bydate <- summarize(newdata_bydate, totalsteps = sum(steps))
 ```
 
-```{r Histogram_newdata}
+
+```r
 # Plotting Histogram
 # The binwidth of the Histogram is the system default binwidth.
 title <- "Histogram - Total Steps Per Day (New Dataset)" # assign chart title
@@ -285,16 +334,19 @@ p <- g + geom_histogram() + labs(list(title = title, x = xlabel, y = ylabel))
 print(p)
 ```
 
+![](PA1_template_files/figure-html/Histogram_newdata-1.png) 
 
-```{r mean_median_newdata}
+
+
+```r
 newmeansteps <- mean(newsum_bydate$totalsteps)        # calculate new mean
 newmediansteps <- median(newsum_bydate$totalsteps)    # calculate new median
 ```
 
 **The mean of the total number of steps taken per day for the new dataset
-is `r newmeansteps`.**  
+is 10766.1886792.**  
 **The median of the total number of steps taken per day for the new dataset
-is `r newmediansteps`.**
+is 10766.1886792.**
 <br>
 <br>
 
@@ -304,10 +356,10 @@ assignment? (i.e. in Analysis 1)
 <br>
 
 Answer:  
-Mean: There is no difference between the old mean (`r meansteps`) and the
-new mean (`r newmeansteps`) after imputing the NA values.  
+Mean: There is no difference between the old mean (10766.1886792) and the
+new mean (10766.1886792) after imputing the NA values.  
 Median: There is a slight increase of the median, from old median
-(`r mediansteps`) to new median (`r newmediansteps`) after imputing the NA values.
+(10765) to new median (10766.1886792) after imputing the NA values.
 <br>
 <br>
 It is interesting to note that the median and the mean are equal after imputing
@@ -324,7 +376,8 @@ Answer:
 The Histogram of total number of steps taken each day for both dataset (with NA
 ignored and with NA imputed) are reproduced below for easy comparison.
 
-```{r Histogram_bothdata, fig.width = 10}
+
+```r
 # Plotting Histogram
 # The binwidth of the Histogram is the system default binwidth.
 
@@ -342,9 +395,12 @@ p <- g + geom_histogram() + labs(list(title = title, x = xlabel, y = ylabel)) +
 print(p)
 ```
 
+![](PA1_template_files/figure-html/Histogram_bothdata-1.png) 
+
 From the Histogram, we can see that there is a new peak in the new histogram.
 
-```{r max_newdata}
+
+```r
 # Find the max freq and bin center of that max frew for the new dataset
 g <- ggplot(subset(combine_data, type == "New_Dataset"), aes(x = totalsteps))
 p <- g + geom_histogram()
@@ -355,7 +411,7 @@ maxdays <- max(histdata$data[[1]][,"count"]) # find the max freq
 bincenter <- histdata$data[[1]][which((histdata$data[[1]][,"count"]) == maxdays),"x"]
 ```
 
-The new peak has a frequncy of `r maxdays` with the bin center at `r bincenter`,
+The new peak has a frequncy of 12 with the bin center at 10929.05,
 which is the results of the method we choose to impute the NA values in the dataset.
 
 
@@ -377,7 +433,8 @@ or weekend days (y-axis).
 Note that dataset with imputed values for NA are used.
 
 #### --- Create new factor variable "weekday" / "weekend" ---
-```{r newdata_newfactor}
+
+```r
 newdata$date <- as.Date(newdata$date, "%Y-%m-%d") # convert text date to date format
 wkday_wkend <- mutate(newdata, dayofweek = weekdays(date)) # add week day column
 
@@ -391,7 +448,8 @@ wkday_wkend$isweekend <- as.factor(wkday_wkend$isweekend) # convert to factor
 
 
 #### --- Time series plot ---
-```{r newdata_timeseries}
+
+```r
 # group data by whether is it a weekend, and by interval
 wkday_wkend <- group_by(wkday_wkend, isweekend, interval)
 mean_wkday_wkend <- summarize(wkday_wkend, averagesteps = mean(steps))
@@ -406,13 +464,16 @@ p <- g + geom_line() + labs(list(title = title, x = xlabel, y = ylabel)) +
 print(p)
 ```
 
+![](PA1_template_files/figure-html/newdata_timeseries-1.png) 
+
 The above plot is required by the question (as shown in the README file example).
 However, it is difficult to compare if there are differences in activity patterns
 between weekdays and weekends. Therefore, another plot in a different format
 is done below.
 
 
-```{r newdata_timeseries2, fig.width = 10}
+
+```r
 # Plot Time Series - Another Format
 title <- "Time Series Plot - Average of 5-minute interval Steps" # assign chart title
 xlabel <- "5-minute interval"       # assign X label
@@ -423,6 +484,8 @@ p <- g + geom_line(size = 1) + labs(list(title = title, x = xlabel, y = ylabel))
         theme(legend.position = c(0.9, 0.8), legend.title=element_blank())
 print(p)
 ```
+
+![](PA1_template_files/figure-html/newdata_timeseries2-1.png) 
 
 The number of steps corresponds to activities level. The higher the number of steps,
 the higher the activity level.  
